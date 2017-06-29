@@ -66,20 +66,21 @@ update_every = 1
 priority = 60000
 retries = 10
 
-ORDER = ['load', 'memory', 'frequency', 'temperature', 'processes', 'fan', 'ecc_errors']
+ORDER = ['load', 'process', 'memory', 'frequency', 'temperature', 'fan', 'ecc_errors']
 
 CHARTS = {
-	'processes': {
-		'options': [None, 'Processes', 'MB', 'Processes', 'nv.processes', 'line'],
-		'lines':[
-			# generated dynamically 
-		]},
-
 	'memory': {
 		'options': [None, 'Memory', 'MB', 'Memory', 'nv.memory', 'line'],
 		'lines': [
 			# generated dynamically
 		]},
+
+	'process':{
+		'options': [None, 'Process', 'MB', 'Process', 'nv.process', 'line'],
+		'lines':[
+			# generated dynamically
+			]},
+
 	'load': {
 		'options': [None, 'Load', '%', 'Load', 'nv.load', 'line'],
 		'lines': [
@@ -178,16 +179,14 @@ class Service(SimpleService):
 				self.definitions['memory']['lines'].append(['device_mem_free_' + gpuIdx, 'free [{0}]'.format(i), 'absolute', 1, 1024**2])
 			# self.definitions['memory']['lines'].append(['device_mem_total_' + gpuIdx, 'GPU:{0} total'.format(i), 'absolute', -1, 1024**2])
 
-			## Processes
-			'''	
-			if data['process_list_' + str(i)] != []:
-				for item in data['process_list_' + str(i)]:
-					self.definitions['processes']['lines'].append([item[0]+ gpuIdx + " Mem_used", 'used [{0}]'.format(i), 'absolute', 1, 1024**2])
-			'''
+			## Mapd occupancy
+			if data['mapd_occupancy_'+str(i)] is not None:
+				self.definitions['process']['lines'].append(['mapd_occupancy_' + gpuIdx, 'mapd memory [{0}] usage', 'absolute', 1, 1024**2])
+
 			## Load/usage
 			if data['device_load_gpu_' + gpuIdx] is not None:
-				self.definitions['load']['lines'].append(['device_load_gpu_' + gpuIdx, 'gpu [{0}]'.format(i), 'absolute'])
-				self.definitions['load']['lines'].append(['device_load_mem_' + gpuIdx, 'memory [{0}]'.format(i), 'absolute'])
+				self.definitions['load']['lines'].append(['device_load_gpu_' + gpuIdx, 'mapd gpu [{0}] usage'.format(i), 'absolute'])
+				self.definitions['load']['lines'].append(['device_load_mem_' + gpuIdx, 'mapd memory [{0}] usage'.format(i), 'absolute'])
 
 			## ECC errors
 			if data['device_ecc_errors_L1_CACHE_VOLATILE_CORRECTED_' + gpuIdx] is not None:
@@ -263,35 +262,24 @@ class Service(SimpleService):
 				brands = ['Unknown', 'Quadro', 'Tesla', 'NVS', 'Grid', 'GeForce']
 
 				### Get data ###
-				## Processes occupation ##
-			    '''
-				try:
-					procs = pynvml.nvmlDeviceGetComputeRunningProcesses(handle)
-					proc_list = []
-					for p in procs:
-					    tmp_proc = []
-						try:
-							p_name = str(pynvml.nvmlSystemGetProcessName(p.pid))
-							tmp_proc.append(p_name)
-							if (p.usedGpuMemory == None):
-								p_mem = 0 
-							else:
-							 	p_mem = p.usedGpuMemory
-							tmp_proc.append(p_mem)
-							proc_list.append(tmp_proc)
-						except Exception as e:
-							self.debug(str(e))
-				except Exception as e:
-					self.debug(str(e))
-					proc_list = []
-				'''
-
 				## Memory usage
 				try:
 					mem = pynvml.nvmlDeviceGetMemoryInfo(handle)
 				except Exception as e:
 					self.debug(str(e))
 					mem = None
+				## Mapd occupation
+				try:
+					mapd_occu = 0
+					procs = pynvml.nvmlDeviceComputeRunningProcesses(handle)
+					for p in procs:
+						name = str(pynvml.nvmlSystemGetProcessName(p.pid))
+						if name == 'BlackScholes':
+							mapd_occu = p.usedGpuMemory
+				except Exception as e:
+					self.debug(str(e))
+					mapd_occu = None
+				
 
 				## ECC errors
 				try:
@@ -327,6 +315,10 @@ class Service(SimpleService):
 
 				## Utilization
 				try:
+					util = pynvml.nvmlDeviceGetUtilizationRates(handle)
+					gpu_util = util.gpu
+					mem_util = util.memory
+				except Exception as e:
 					self.debug(str(e))
 					gpu_util = None
 					mem_util = None
@@ -346,14 +338,11 @@ class Service(SimpleService):
 				self.debug("Device", gpuIdx, ":", str(name))
 				data["device_name_" + gpuIdx] = name
 
-
 				self.debug("Brand:", str(brands[brand]))
 				
-				'''
-				data["process_list_" + gpuIdx] = proc_list
-				for item in proc_list:
-					data[item[0] + gpuIdx + " Mem_used"] = item[1]
-				'''
+				## pack mapd occupation
+				data['mapd_occupancy_' + gpuIdx] = mapd_occu
+
 
 				self.debug(str(name), "Temp      :", str(temp))
 				data["device_temp_" + gpuIdx] = temp
