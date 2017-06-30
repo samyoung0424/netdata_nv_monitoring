@@ -184,7 +184,7 @@ class Service(SimpleService):
 			if data['mapd_occupancy_'+str(i)] is not None:
 				self.definitions['process']['lines'].append(['mapd_occupancy_' + gpuIdx, 'mapd memory [{0}] usage', 'absolute', 1, 1024**2])
 			'''
-			self.definitions['mapd']['lines'].append(['device_mem_used_' + gpuIdx, 'mapd memory [{0}] usage', 'absolute', 1, 1024 ** 2])
+			self.definitions['mapd']['lines'].append(['mapd_occupancy_' + gpuIdx, 'mapd memory [{0}] usage', 'absolute', 1, 1024 ** 2])
 
 			## Load/usage
 			if data['device_load_gpu_' + gpuIdx] is not None:
