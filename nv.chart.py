@@ -75,8 +75,8 @@ CHARTS = {
 			# generated dynamically
 		]},
 
-	'process':{
-		'options': [None, 'Process', 'MB', 'Process', 'nv.process', 'line'],
+	'mapd':{
+		'options': [None, 'Mapd Occupancy', 'MB', 'Mapd Occupancy', 'nv.mapd', 'line'],
 		'lines':[
 			# generated dynamically
 			]},
@@ -184,12 +184,12 @@ class Service(SimpleService):
 			if data['mapd_occupancy_'+str(i)] is not None:
 				self.definitions['process']['lines'].append(['mapd_occupancy_' + gpuIdx, 'mapd memory [{0}] usage', 'absolute', 1, 1024**2])
 			'''
-			self.definitions['process']['lines'].append(['device_mem_used_' + gpuIdx, 'mapd memory [{0}] usage', 'absolute', 1, 1024 ** 2])
+			self.definitions['mapd']['lines'].append(['mapd_occupancy_' + gpuIdx, 'mapd memory [{0}] usage', 'absolute', 1, 1024 ** 2])
 
 			## Load/usage
 			if data['device_load_gpu_' + gpuIdx] is not None:
-				self.definitions['load']['lines'].append(['device_load_gpu_' + gpuIdx, 'mapd gpu [{0}] usage'.format(i), 'absolute'])
-				self.definitions['load']['lines'].append(['device_load_mem_' + gpuIdx, 'mapd memory [{0}] usage'.format(i), 'absolute'])
+				self.definitions['load']['lines'].append(['device_load_gpu_' + gpuIdx, 'gpu [{0}] usage'.format(i), 'absolute'])
+				self.definitions['load']['lines'].append(['device_load_mem_' + gpuIdx, 'memory [{0}] usage'.format(i), 'absolute'])
 
 			## ECC errors
 			if data['device_ecc_errors_L1_CACHE_VOLATILE_CORRECTED_' + gpuIdx] is not None:
@@ -277,8 +277,10 @@ class Service(SimpleService):
 					procs = pynvml.nvmlDeviceGetComputeRunningProcesses(handle)
 					for p in procs:
 						name = str(pynvml.nvmlSystemGetProcessName(p.pid))
-						if name == 'BlackScholes':
+						if 'mapd' in name:
 							mapd_occu = p.usedGpuMemory
+						else:
+							mapd_occu = 0
 				except Exception as e:
 					self.debug(str(e))
 					mapd_occu = None
