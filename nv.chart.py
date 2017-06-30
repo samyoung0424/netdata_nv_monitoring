@@ -282,7 +282,7 @@ class Service(SimpleService):
 							mapd_occu = 0
 				except Exception as e:
 					self.debug(str(e))
-					mapd_occu = None
+					
 				
 
 				## ECC errors
