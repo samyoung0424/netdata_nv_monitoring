@@ -271,7 +271,7 @@ class Service(SimpleService):
 				## Mapd occupation
 				try:
 					mapd_occu = 0
-					procs = pynvml.nvmlDeviceComputeRunningProcesses(handle)
+					procs = pynvml.nvmlDeviceGetComputeRunningProcesses(handle)
 					for p in procs:
 						name = str(pynvml.nvmlSystemGetProcessName(p.pid))
 						if name == 'BlackScholes':
