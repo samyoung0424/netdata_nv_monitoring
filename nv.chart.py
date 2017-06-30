@@ -275,14 +275,10 @@ class Service(SimpleService):
 					mapd_occu = 0
 					procs = pynvml.nvmlDeviceGetComputeRunningProcesses(handle)
 					for p in procs:
-						name = str(pynvml.nvmlSystemGetProcessName(p.pid))
-						if 'mapd' in name:
-							mapd_occu = p.usedGpuMemory
-						else:
-							mapd_occu = 0
+						mapd_occu = p.usedGpuMemory
 				except Exception as e:
 					self.debug(str(e))
-                    mapd_occu = 100000
+		                        mapd_occu = 100000
 
 				
 
