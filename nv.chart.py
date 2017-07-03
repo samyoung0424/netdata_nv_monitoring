@@ -31,20 +31,20 @@ DEALINGS IN THE SOFTWARE.
 # @Title			: nv.chart
 # @Project			:
 # @Description		: NetData plugin for Nvidia GPU stats
-# @Author			: Jan Arnold
-# @Email			: jan.arnold (at) coraxx.net
-# @Copyright		: Copyright (C) 2016  Jan Arnold
+# @Author			: Sen Yang
+# @Email			: tjusenyang@gmail.com
+# @Copyright		: Copyright (C) 2017  Sen Yang
 # @License			: MIT
 # @Credits			:
-# @Maintainer		: Jan Arnold
-# @Date				: 2016/08/30
-# @Version			: 0.5
+# @Maintainer		: Sen Yang
+# @Date				: 2017/07/03
+# @Version			: 2.0
 # @Status			: stable
 # @Usage			: automatically processed by netdata
 # @Notes			: With default NetData installation put this file under
 #					: /usr/libexec/netdata/python.d/
 #					: and the config file under /etc/netdata/python.d/
-# @Python_version	: 2.7.12 and 3.5.2
+# @Python_version	: 2.7.12
 """
 # ======================================================================================================================
 from base import SimpleService
