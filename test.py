@@ -5,6 +5,8 @@ deviceCount = pynvml.nvmlDeviceGetCount()
 for i in range(deviceCount):
     handle = pynvml.nvmlDeviceGetHandleByIndex(i)
     procs = pynvml.nvmlDeviceGetComputeRunningProcesses(handle)
-    print procs
+    for p in procs:
+        name = pynvml.nvmlSystemGetProcessName(p.pid)
+        print name
 
 pynvml.nvmlShutdown()
