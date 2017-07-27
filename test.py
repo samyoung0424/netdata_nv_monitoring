@@ -9,7 +9,7 @@ for i in range(deviceCount):
 
     for p in procs:
         print p.pid, type(p.pid)
-        name = pynvml.nvmlSystemGetProcessName(str(p.pid))
-        print name
+        #name = pynvml.nvmlSystemGetProcessName(p.pid)
+        #print name
 
 pynvml.nvmlShutdown()
