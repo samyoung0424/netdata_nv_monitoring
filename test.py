@@ -11,8 +11,8 @@ while True:
 
         for p in procs:
             print p.pid, type(p.pid)
-            #name = pynvml.nvmlSystemGetProcessName(p.pid)
-            #print name
+            name = pynvml.nvmlSystemGetProcessName(p.pid)
+            print name
     time.sleep(2)
 
 pynvml.nvmlShutdown()
