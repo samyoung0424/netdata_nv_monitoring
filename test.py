@@ -1,18 +1,15 @@
 import pynvml
-import time
 
 pynvml.nvmlInit()
 deviceCount = pynvml.nvmlDeviceGetCount()
-while True:
-    for i in range(deviceCount):
-        print i
-        handle = pynvml.nvmlDeviceGetHandleByIndex(i)
-        procs = pynvml.nvmlDeviceGetComputeRunningProcesses(handle)
-
-        for p in procs:
-            print p.pid, type(p.pid)
-            name = pynvml.nvmlSystemGetProcessName(p.pid)
-            print name
-    time.sleep(2)
+for i in range(deviceCount):
+    print i
+    handle = pynvml.nvmlDeviceGetHandleByIndex(i)
+    procs = pynvml.nvmlDeviceGetComputeRunningProcesses(handle)
+    for p in procs:
+        pid = str(p.pid)
+        with open("/host/proc/" + pid + "cmdline") as name:
+            if 'mapd_server' in name:
+                print name
 
 pynvml.nvmlShutdown()
