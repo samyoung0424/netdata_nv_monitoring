@@ -182,7 +182,7 @@ class Service(SimpleService):
 			## Mapd occupancy
 
 			if data['mapd_occupancy_'+ gpuIdx] is not None:
-				self.definitions['mapd']['lines'].append(['mapd_occupancy_' + gpuIdx, 'mapd memory [{0}] usage', 'absolute', 1, 1024 ** 2])
+				self.definitions['mapd']['lines'].append(['mapd_occupancy_' + gpuIdx, '[{0}] usage', 'absolute', 1, 1024 ** 2])
 
 
 			## Load/usage
@@ -345,7 +345,7 @@ class Service(SimpleService):
 				self.debug("Brand:", str(brands[brand]))
 				
 				## pack mapd occupation
-				data['mapd_occupancy_' + gpuIdx] = mapd_occu
+				data['mapd_occupancy_' + gpuIdx] = str(mapd_occu)
 
 
 				self.debug(str(name), "Temp      :", str(temp))
