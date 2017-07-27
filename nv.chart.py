@@ -275,10 +275,13 @@ class Service(SimpleService):
 					mapd_occu = 0
 					procs = pynvml.nvmlDeviceGetComputeRunningProcesses(handle)
 					for p in procs:
-						mapd_occu = p.usedGpuMemory
+						pid = str(p.pid)
+						with open("/host/proc/" + pid + "/cmdline") as pid_file:
+							for line in pid_file:
+								if line.find("mapd_server") != -1:
+									mapd_occu = p.usedGpuMemory
 				except Exception as e:
-					self.debug(str(e))
-		                        mapd_occu = 100000
+					mapd_occu = 0
 
 				
 
